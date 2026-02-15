@@ -22,7 +22,7 @@
         input {
             font-size: 18px;
             padding: 5px;
-            width: 100px;
+            width: 120px;
             text-align: center;
         }
         button {
@@ -43,8 +43,10 @@
     <div class="modos">
         <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
         <label><input type="radio" name="modo" value="tabuadaRand"> Tabuada Aleatória</label><br>
-        <label><input type="radio" name="modo" value="soma"> Treino de Soma</label><br>
-        <label><input type="radio" name="modo" value="subtracao"> Treino de Subtração</label><br><br>
+        <label><input type="radio" name="modo" value="soma"> Soma (até 4 algarismos)</label><br>
+        <label><input type="radio" name="modo" value="subtracao"> Subtração (até 4 algarismos)</label><br>
+        <label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação (até 2 algarismos)</label><br>
+        <label><input type="radio" name="modo" value="divisao"> Divisão (resultado inteiro)</label><br><br>
         <button onclick="iniciar()">Iniciar</button>
     </div>
 
@@ -82,29 +84,45 @@
             respostaEl.value = "";
             respostaEl.focus();
 
-            if (modo === "tabuadaSeq") {
-                operacao = "×";
-            }
+            switch (modo) {
 
-            if (modo === "tabuadaRand") {
-                operacao = "×";
-                a = gerarNumero(8) + 1;
-                b = gerarNumero(8) + 1;
-            }
+                case "tabuadaSeq":
+                    operacao = "×";
+                    break;
 
-            if (modo === "soma") {
-                operacao = "+";
-                a = gerarNumero(9999);
-                b = gerarNumero(9999);
-            }
+                case "tabuadaRand":
+                    operacao = "×";
+                    a = gerarNumero(8) + 1;
+                    b = gerarNumero(8) + 1;
+                    break;
 
-            if (modo === "subtracao") {
-                operacao = "−";
-                a = gerarNumero(9999);
-                b = gerarNumero(9999);
-                if (b > a) {
-                    [a, b] = [b, a]; // garante resultado não negativo
-                }
+                case "soma":
+                    operacao = "+";
+                    a = gerarNumero(9999);
+                    b = gerarNumero(9999);
+                    break;
+
+                case "subtracao":
+                    operacao = "−";
+                    a = gerarNumero(9999);
+                    b = gerarNumero(9999);
+                    if (b > a) {
+                        [a, b] = [b, a];
+                    }
+                    break;
+
+                case "multiplicacao2d":
+                    operacao = "×";
+                    a = gerarNumero(99);
+                    b = gerarNumero(99);
+                    break;
+
+                case "divisao":
+                    operacao = "÷";
+                    b = gerarNumero(9998) + 1; // divisor nunca 0
+                    let resultado = gerarNumero(9999);
+                    a = b * resultado;
+                    break;
             }
 
             contaEl.textContent = `${a} ${operacao} ${b} = ?`;
@@ -118,6 +136,7 @@
                 case "×": correto = a * b; break;
                 case "+": correto = a + b; break;
                 case "−": correto = a - b; break;
+                case "÷": correto = a / b; break;
             }
 
             if (resposta === correto) {
@@ -148,7 +167,6 @@
             setTimeout(mostrarConta, 600);
         }
 
-        // ENTER envia a resposta
         respostaEl.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
                 verificar();
