@@ -38,141 +38,161 @@
 </head>
 <body>
 
-    <h1>Treino de Matemática</h1>
+<h1>Treino de Matemática</h1>
 
-    <div class="modos">
-        <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
-        <label><input type="radio" name="modo" value="tabuadaRand"> Tabuada Aleatória</label><br>
-        <label><input type="radio" name="modo" value="soma"> Soma (até 4 algarismos)</label><br>
-        <label><input type="radio" name="modo" value="subtracao"> Subtração (até 4 algarismos)</label><br>
-        <label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação (até 2 algarismos)</label><br>
-        <label><input type="radio" name="modo" value="divisao"> Divisão (resultado inteiro)</label><br><br>
-        <button onclick="iniciar()">Iniciar</button>
-    </div>
+<div class="modos">
+    <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
+    <label><input type="radio" name="modo" value="tabuadaRand"> Tabuada Aleatória</label><br>
+    <label><input type="radio" name="modo" value="soma"> Soma (até 4 algarismos)</label><br>
+    <label><input type="radio" name="modo" value="subtracao"> Subtração (até 4 algarismos)</label><br>
+    <label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação (até 2 algarismos)</label><br>
+    <label><input type="radio" name="modo" value="divisao"> Divisão (resultado inteiro, até 4 algarismos)</label><br><br>
+    <button onclick="iniciar()">Iniciar</button>
+</div>
 
-    <div class="conta" id="conta"></div>
+<div class="conta" id="conta"></div>
 
-    <input type="number" id="resposta" placeholder="Resposta">
-    <button onclick="verificar()">OK</button>
+<input type="number" id="resposta" placeholder="Resposta">
+<button onclick="verificar()">OK</button>
 
-    <div class="mensagem" id="mensagem"></div>
+<div class="mensagem" id="mensagem"></div>
 
-    <script>
-        let modo = "tabuadaSeq";
-        let a = 1;
-        let b = 1;
-        let operacao = "×";
+<script>
 
-        const contaEl = document.getElementById("conta");
-        const respostaEl = document.getElementById("resposta");
-        const mensagemEl = document.getElementById("mensagem");
+let modo = "tabuadaSeq";
+let a = 1;
+let b = 1;
+let operacao = "×";
 
-        function iniciar() {
-            modo = document.querySelector('input[name="modo"]:checked').value;
-            a = 1;
-            b = 1;
-            respostaEl.style.display = "inline-block";
-            mostrarConta();
-        }
+const contaEl = document.getElementById("conta");
+const respostaEl = document.getElementById("resposta");
+const mensagemEl = document.getElementById("mensagem");
 
-        function gerarNumero(max) {
-            return Math.floor(Math.random() * (max + 1));
-        }
+function iniciar() {
+    modo = document.querySelector('input[name="modo"]:checked').value;
+    a = 1;
+    b = 1;
+    respostaEl.style.display = "inline-block";
+    mostrarConta();
+}
 
-        function mostrarConta() {
-            mensagemEl.textContent = "";
-            respostaEl.value = "";
-            respostaEl.focus();
+function gerarNumero(max) {
+    return Math.floor(Math.random() * (max + 1));
+}
 
-            switch (modo) {
+function mostrarConta() {
 
-                case "tabuadaSeq":
-                    operacao = "×";
-                    break;
+    mensagemEl.textContent = "";
+    respostaEl.value = "";
+    respostaEl.focus();
 
-                case "tabuadaRand":
-                    operacao = "×";
-                    a = gerarNumero(8) + 1;
-                    b = gerarNumero(8) + 1;
-                    break;
+    switch (modo) {
 
-                case "soma":
-                    operacao = "+";
-                    a = gerarNumero(9999);
-                    b = gerarNumero(9999);
-                    break;
+        case "tabuadaSeq":
+            operacao = "×";
+            break;
 
-                case "subtracao":
-                    operacao = "−";
-                    a = gerarNumero(9999);
-                    b = gerarNumero(9999);
-                    if (b > a) {
-                        [a, b] = [b, a];
-                    }
-                    break;
+        case "tabuadaRand":
+            operacao = "×";
+            a = gerarNumero(8) + 1;
+            b = gerarNumero(8) + 1;
+            break;
 
-                case "multiplicacao2d":
-                    operacao = "×";
-                    a = gerarNumero(99);
-                    b = gerarNumero(99);
-                    break;
+        case "soma":
+            operacao = "+";
+            a = gerarNumero(9999);
+            b = gerarNumero(9999);
+            break;
 
-                case "divisao":
-                    operacao = "÷";
-                    b = gerarNumero(9998) + 1; // divisor nunca 0
-                    let resultado = gerarNumero(9999);
-                    a = b * resultado;
-                    break;
+        case "subtracao":
+            operacao = "−";
+            a = gerarNumero(9999);
+            b = gerarNumero(9999);
+            if (b > a) {
+                [a, b] = [b, a];
             }
+            break;
 
-            contaEl.textContent = `${a} ${operacao} ${b} = ?`;
-        }
+        case "multiplicacao2d":
+            operacao = "×";
+            a = gerarNumero(99);
+            b = gerarNumero(99);
+            break;
 
-        function verificar() {
-            const resposta = Number(respostaEl.value);
-            let correto;
+        case "divisao":
+            operacao = "÷";
 
-            switch (operacao) {
-                case "×": correto = a * b; break;
-                case "+": correto = a + b; break;
-                case "−": correto = a - b; break;
-                case "÷": correto = a / b; break;
-            }
+            // Divisor de 1 a 9999
+            b = gerarNumero(9998) + 1;
 
-            if (resposta === correto) {
-                mensagemEl.textContent = "✅ Correto!";
-                if (modo === "tabuadaSeq") {
-                    proximaSequencia();
-                } else {
-                    setTimeout(mostrarConta, 600);
-                }
-            } else {
-                mensagemEl.textContent = "❌ Errado, tente novamente.";
-            }
-        }
+            // Calcula o maior resultado possível para não passar de 9999
+            let maxResultado = Math.floor(9999 / b);
 
-        function proximaSequencia() {
-            b++;
-            if (b > 9) {
+            // Garante que exista pelo menos resultado 1
+            if (maxResultado < 1) {
                 b = 1;
-                a++;
+                maxResultado = 9999;
             }
 
-            if (a > 9) {
-                contaEl.textContent = "🎉 Você concluiu a tabuada!";
-                respostaEl.style.display = "none";
-                return;
-            }
+            let resultado = gerarNumero(maxResultado) + 1;
 
+            a = b * resultado; // garante divisão exata
+            break;
+    }
+
+    contaEl.textContent = `${a} ${operacao} ${b} = ?`;
+}
+
+function verificar() {
+
+    const resposta = Number(respostaEl.value);
+    let correto;
+
+    switch (operacao) {
+        case "×": correto = a * b; break;
+        case "+": correto = a + b; break;
+        case "−": correto = a - b; break;
+        case "÷": correto = a / b; break;
+    }
+
+    if (resposta === correto) {
+        mensagemEl.textContent = "✅ Correto!";
+
+        if (modo === "tabuadaSeq") {
+            proximaSequencia();
+        } else {
             setTimeout(mostrarConta, 600);
         }
 
-        respostaEl.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                verificar();
-            }
-        });
-    </script>
+    } else {
+        mensagemEl.textContent = "❌ Errado, tente novamente.";
+    }
+}
+
+function proximaSequencia() {
+    b++;
+    if (b > 9) {
+        b = 1;
+        a++;
+    }
+
+    if (a > 9) {
+        contaEl.textContent = "🎉 Você concluiu a tabuada!";
+        respostaEl.style.display = "none";
+        return;
+    }
+
+    setTimeout(mostrarConta, 600);
+}
+
+// ENTER envia resposta
+respostaEl.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        verificar();
+    }
+});
+
+</script>
 
 </body>
 </html>
