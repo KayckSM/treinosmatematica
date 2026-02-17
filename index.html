@@ -1,79 +1,83 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Treino de Matemática</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 40px;
-        }
+<meta charset="UTF-8">
+<title>Treino de Matemática</title>
 
-        /* CRONÔMETRO FIXO NO CANTO */
-        .cronometro-container {
-            position: fixed;
-            top: 10px;
-            right: 20px;
-            text-align: right;
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        }
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 40px;
+}
 
-        .tempo {
-            font-size: 22px;
-            font-weight: bold;
-        }
+/* CRONÔMETRO */
+.cronometro-container {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    text-align: right;
+    background: #f0f0f0;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
 
-        .atalho {
-            font-size: 12px;
-            color: #555;
-        }
+.tempo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
 
-        .modos {
-            margin-bottom: 20px;
-        }
+.atalho {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+}
 
-        .conta {
-            font-size: 32px;
-            margin: 20px 0;
-        }
+.modos {
+    margin-bottom: 20px;
+}
 
-        input {
-            font-size: 18px;
-            padding: 5px;
-            width: 120px;
-            text-align: center;
-        }
+.conta {
+    font-size: 32px;
+    margin: 20px 0;
+}
 
-        button {
-            font-size: 14px;
-            padding: 5px 10px;
-            margin: 3px;
-        }
+input {
+    font-size: 18px;
+    padding: 5px;
+    width: 120px;
+    text-align: center;
+}
 
-        .mensagem {
-            margin-top: 15px;
-            font-size: 18px;
-        }
-    </style>
+button {
+    font-size: 13px;
+    padding: 5px 10px;
+    margin: 3px;
+}
+
+.mensagem {
+    margin-top: 15px;
+    font-size: 18px;
+}
+</style>
 </head>
+
 <body>
 
 <!-- CRONÔMETRO -->
 <div class="cronometro-container">
-    <div class="tempo" id="tempo">00:00</div>
+    <div class="tempo" id="tempo">00:00:000</div>
     <button onclick="iniciarCronometro()">Iniciar</button>
     <button onclick="pausarCronometro()">Pausar</button>
+    <button onclick="continuarCronometro()">Voltar</button>
     <button onclick="resetarCronometro()">Resetar</button>
-    <div class="atalho">Pressione a tecla "T" para pausar ou continuar</div>
+    <div class="atalho">Pressione a tecla "T" para pausar ou voltar</div>
 </div>
 
 <h1>Treino de Matemática</h1>
-<h2>Te amoooo, Sthefanny</h2>
-    
+<h2>Te amooooo, Sthefanny</h2>
 
 <div class="modos">
     <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
@@ -94,41 +98,58 @@
 
 <script>
 
-// =========================
-// CRONÔMETRO INDEPENDENTE
-// =========================
+/* =========================
+   CRONÔMETRO AVANÇADO
+========================= */
 
-let tempo = 0;
+let inicioTempo = 0;
+let tempoDecorrido = 0;
 let intervalo = null;
 let rodando = false;
 
 const tempoEl = document.getElementById("tempo");
 
 function atualizarDisplay() {
-    let minutos = Math.floor(tempo / 60);
-    let segundos = tempo % 60;
+    let total = tempoDecorrido;
+
+    let minutos = Math.floor(total / 60000);
+    let segundos = Math.floor((total % 60000) / 1000);
+    let milissegundos = total % 1000;
+
     tempoEl.textContent =
-        `${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}`;
+        `${String(minutos).padStart(2,'0')}:` +
+        `${String(segundos).padStart(2,'0')}:` +
+        `${String(milissegundos).padStart(3,'0')}`;
 }
 
 function iniciarCronometro() {
     if (!rodando) {
-        rodando = true;
+        inicioTempo = Date.now() - tempoDecorrido;
         intervalo = setInterval(() => {
-            tempo++;
+            tempoDecorrido = Date.now() - inicioTempo;
             atualizarDisplay();
-        }, 1000);
+        }, 10);
+        rodando = true;
     }
 }
 
 function pausarCronometro() {
-    rodando = false;
-    clearInterval(intervalo);
+    if (rodando) {
+        clearInterval(intervalo);
+        rodando = false;
+    }
+}
+
+function continuarCronometro() {
+    if (!rodando) {
+        iniciarCronometro();
+    }
 }
 
 function resetarCronometro() {
-    pausarCronometro();
-    tempo = 0;
+    clearInterval(intervalo);
+    rodando = false;
+    tempoDecorrido = 0;
     atualizarDisplay();
 }
 
@@ -138,14 +159,14 @@ document.addEventListener("keydown", function(event) {
         if (rodando) {
             pausarCronometro();
         } else {
-            iniciarCronometro();
+            continuarCronometro();
         }
     }
 });
 
-// =========================
-// SISTEMA DE TREINO
-// =========================
+/* =========================
+   SISTEMA DE TREINO
+========================= */
 
 let modo = "tabuadaSeq";
 let a = 1;
@@ -234,14 +255,12 @@ function verificar() {
     }
 
     if (resposta === correto) {
-
         if (modo === "tabuadaSeq") {
             proximaSequencia();
         } else {
             mensagemEl.textContent = "✅ Correto!";
             setTimeout(mostrarConta, 600);
         }
-
     } else {
         mensagemEl.textContent = "❌ Errado, tente novamente.";
     }
