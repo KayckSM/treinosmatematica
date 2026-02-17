@@ -9,15 +9,17 @@
             text-align: center;
             margin-top: 40px;
         }
-        h1 {
-            margin-bottom: 10px;
-        }
         .modos {
             margin-bottom: 20px;
         }
         .conta {
             font-size: 32px;
             margin: 20px 0;
+        }
+        .cronometro {
+            font-size: 20px;
+            margin-top: 10px;
+            color: darkblue;
         }
         input {
             font-size: 18px;
@@ -39,7 +41,6 @@
 <body>
 
 <h1>Treino de Matemática</h1>
-<h2>Te amooooooo, Sthefanny</h2>
 
 <div class="modos">
     <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
@@ -47,10 +48,11 @@
     <label><input type="radio" name="modo" value="soma"> Soma (até 4 algarismos)</label><br>
     <label><input type="radio" name="modo" value="subtracao"> Subtração (até 4 algarismos)</label><br>
     <label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação (até 2 algarismos)</label><br>
-    <label><input type="radio" name="modo" value="divisao"> Divisão (resultado inteiro, até 4 algarismos)</label><br><br>
+    <label><input type="radio" name="modo" value="divisao"> Divisão (resultado inteiro)</label><br><br>
     <button onclick="iniciar()">Iniciar</button>
 </div>
 
+<div class="cronometro" id="cronometro"></div>
 <div class="conta" id="conta"></div>
 
 <input type="number" id="resposta" placeholder="Resposta">
@@ -65,16 +67,47 @@ let a = 1;
 let b = 1;
 let operacao = "×";
 
+let tempoInicio;
+let intervaloCronometro;
+
 const contaEl = document.getElementById("conta");
 const respostaEl = document.getElementById("resposta");
 const mensagemEl = document.getElementById("mensagem");
+const cronometroEl = document.getElementById("cronometro");
 
 function iniciar() {
+
     modo = document.querySelector('input[name="modo"]:checked').value;
     a = 1;
     b = 1;
     respostaEl.style.display = "inline-block";
+
+    if (modo === "tabuadaSeq") {
+        iniciarCronometro();
+    } else {
+        pararCronometro();
+        cronometroEl.textContent = "";
+    }
+
     mostrarConta();
+}
+
+function iniciarCronometro() {
+    tempoInicio = Date.now();
+
+    intervaloCronometro = setInterval(() => {
+        let tempoAtual = Date.now() - tempoInicio;
+        let segundos = Math.floor(tempoAtual / 1000);
+        let minutos = Math.floor(segundos / 60);
+        segundos = segundos % 60;
+
+        cronometroEl.textContent =
+            `⏱️ Tempo: ${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+    }, 1000);
+}
+
+function pararCronometro() {
+    clearInterval(intervaloCronometro);
 }
 
 function gerarNumero(max) {
@@ -109,9 +142,7 @@ function mostrarConta() {
             operacao = "−";
             a = gerarNumero(9999);
             b = gerarNumero(9999);
-            if (b > a) {
-                [a, b] = [b, a];
-            }
+            if (b > a) [a, b] = [b, a];
             break;
 
         case "multiplicacao2d":
@@ -122,22 +153,14 @@ function mostrarConta() {
 
         case "divisao":
             operacao = "÷";
-
-            // Divisor de 1 a 9999
             b = gerarNumero(9998) + 1;
-
-            // Calcula o maior resultado possível para não passar de 9999
             let maxResultado = Math.floor(9999 / b);
-
-            // Garante que exista pelo menos resultado 1
             if (maxResultado < 1) {
                 b = 1;
                 maxResultado = 9999;
             }
-
             let resultado = gerarNumero(maxResultado) + 1;
-
-            a = b * resultado; // garante divisão exata
+            a = b * resultado;
             break;
     }
 
@@ -157,11 +180,11 @@ function verificar() {
     }
 
     if (resposta === correto) {
-        mensagemEl.textContent = "✅ Correto!";
 
         if (modo === "tabuadaSeq") {
             proximaSequencia();
         } else {
+            mensagemEl.textContent = "✅ Correto!";
             setTimeout(mostrarConta, 600);
         }
 
@@ -178,15 +201,24 @@ function proximaSequencia() {
     }
 
     if (a > 9) {
-        contaEl.textContent = "🎉 Você concluiu a tabuada!";
+        pararCronometro();
+
+        let tempoFinal = Date.now() - tempoInicio;
+        let segundos = Math.floor(tempoFinal / 1000);
+        let minutos = Math.floor(segundos / 60);
+        segundos = segundos % 60;
+
+        contaEl.textContent =
+            `🎉 Concluído! Tempo final: ${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+
         respostaEl.style.display = "none";
+        cronometroEl.textContent = "";
         return;
     }
 
-    setTimeout(mostrarConta, 600);
+    mostrarConta();
 }
 
-// ENTER envia resposta
 respostaEl.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
         verificar();
