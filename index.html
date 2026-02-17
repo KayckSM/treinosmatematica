@@ -9,29 +9,51 @@
             text-align: center;
             margin-top: 40px;
         }
+
+        /* CRONÔMETRO FIXO NO CANTO */
+        .cronometro-container {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            text-align: right;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        .tempo {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .atalho {
+            font-size: 12px;
+            color: #555;
+        }
+
         .modos {
             margin-bottom: 20px;
         }
+
         .conta {
             font-size: 32px;
             margin: 20px 0;
         }
-        .cronometro {
-            font-size: 20px;
-            margin-top: 10px;
-            color: darkblue;
-        }
+
         input {
             font-size: 18px;
             padding: 5px;
             width: 120px;
             text-align: center;
         }
+
         button {
-            font-size: 16px;
-            padding: 6px 12px;
-            margin: 5px;
+            font-size: 14px;
+            padding: 5px 10px;
+            margin: 3px;
         }
+
         .mensagem {
             margin-top: 15px;
             font-size: 18px;
@@ -40,7 +62,18 @@
 </head>
 <body>
 
+<!-- CRONÔMETRO -->
+<div class="cronometro-container">
+    <div class="tempo" id="tempo">00:00</div>
+    <button onclick="iniciarCronometro()">Iniciar</button>
+    <button onclick="pausarCronometro()">Pausar</button>
+    <button onclick="resetarCronometro()">Resetar</button>
+    <div class="atalho">Pressione a tecla "T" para pausar ou continuar</div>
+</div>
+
 <h1>Treino de Matemática</h1>
+<h2>Te amoooo, Sthefanny</h2>
+    
 
 <div class="modos">
     <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
@@ -52,7 +85,6 @@
     <button onclick="iniciar()">Iniciar</button>
 </div>
 
-<div class="cronometro" id="cronometro"></div>
 <div class="conta" id="conta"></div>
 
 <input type="number" id="resposta" placeholder="Resposta">
@@ -62,52 +94,74 @@
 
 <script>
 
+// =========================
+// CRONÔMETRO INDEPENDENTE
+// =========================
+
+let tempo = 0;
+let intervalo = null;
+let rodando = false;
+
+const tempoEl = document.getElementById("tempo");
+
+function atualizarDisplay() {
+    let minutos = Math.floor(tempo / 60);
+    let segundos = tempo % 60;
+    tempoEl.textContent =
+        `${String(minutos).padStart(2,'0')}:${String(segundos).padStart(2,'0')}`;
+}
+
+function iniciarCronometro() {
+    if (!rodando) {
+        rodando = true;
+        intervalo = setInterval(() => {
+            tempo++;
+            atualizarDisplay();
+        }, 1000);
+    }
+}
+
+function pausarCronometro() {
+    rodando = false;
+    clearInterval(intervalo);
+}
+
+function resetarCronometro() {
+    pausarCronometro();
+    tempo = 0;
+    atualizarDisplay();
+}
+
+// Atalho tecla T
+document.addEventListener("keydown", function(event) {
+    if (event.key.toLowerCase() === "t") {
+        if (rodando) {
+            pausarCronometro();
+        } else {
+            iniciarCronometro();
+        }
+    }
+});
+
+// =========================
+// SISTEMA DE TREINO
+// =========================
+
 let modo = "tabuadaSeq";
 let a = 1;
 let b = 1;
 let operacao = "×";
 
-let tempoInicio;
-let intervaloCronometro;
-
 const contaEl = document.getElementById("conta");
 const respostaEl = document.getElementById("resposta");
 const mensagemEl = document.getElementById("mensagem");
-const cronometroEl = document.getElementById("cronometro");
 
 function iniciar() {
-
     modo = document.querySelector('input[name="modo"]:checked').value;
     a = 1;
     b = 1;
     respostaEl.style.display = "inline-block";
-
-    if (modo === "tabuadaSeq") {
-        iniciarCronometro();
-    } else {
-        pararCronometro();
-        cronometroEl.textContent = "";
-    }
-
     mostrarConta();
-}
-
-function iniciarCronometro() {
-    tempoInicio = Date.now();
-
-    intervaloCronometro = setInterval(() => {
-        let tempoAtual = Date.now() - tempoInicio;
-        let segundos = Math.floor(tempoAtual / 1000);
-        let minutos = Math.floor(segundos / 60);
-        segundos = segundos % 60;
-
-        cronometroEl.textContent =
-            `⏱️ Tempo: ${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-    }, 1000);
-}
-
-function pararCronometro() {
-    clearInterval(intervaloCronometro);
 }
 
 function gerarNumero(max) {
@@ -201,18 +255,8 @@ function proximaSequencia() {
     }
 
     if (a > 9) {
-        pararCronometro();
-
-        let tempoFinal = Date.now() - tempoInicio;
-        let segundos = Math.floor(tempoFinal / 1000);
-        let minutos = Math.floor(segundos / 60);
-        segundos = segundos % 60;
-
-        contaEl.textContent =
-            `🎉 Concluído! Tempo final: ${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-
+        contaEl.textContent = "🎉 Você concluiu a tabuada!";
         respostaEl.style.display = "none";
-        cronometroEl.textContent = "";
         return;
     }
 
