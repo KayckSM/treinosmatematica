@@ -6,58 +6,58 @@
 
 <style>
 body{
-    font-family:Arial, sans-serif;
-    text-align:center;
-    margin-top:40px;
+font-family:Arial,sans-serif;
+text-align:center;
+margin-top:40px;
 }
 
 .cronometro-container{
-    position:fixed;
-    top:10px;
-    right:20px;
-    text-align:right;
-    background:#f0f0f0;
-    padding:12px;
-    border-radius:8px;
-    box-shadow:0 0 8px rgba(0,0,0,0.2);
+position:fixed;
+top:10px;
+right:20px;
+text-align:right;
+background:#f0f0f0;
+padding:12px;
+border-radius:8px;
+box-shadow:0 0 8px rgba(0,0,0,0.2);
 }
 
 .tempo{
-    font-size:22px;
-    font-weight:bold;
+font-size:22px;
+font-weight:bold;
 }
 
 .atalho{
-    font-size:12px;
-    color:#555;
-    margin-top:5px;
+font-size:12px;
+color:#555;
+margin-top:5px;
 }
 
 .modos{
-    margin-bottom:20px;
+margin-bottom:20px;
 }
 
 .conta{
-    font-size:32px;
-    margin:20px 0;
+font-size:32px;
+margin:20px 0;
 }
 
 input{
-    font-size:18px;
-    padding:5px;
-    width:120px;
-    text-align:center;
+font-size:18px;
+padding:5px;
+width:120px;
+text-align:center;
 }
 
 button{
-    font-size:13px;
-    padding:5px 10px;
-    margin:3px;
+font-size:13px;
+padding:5px 10px;
+margin:3px;
 }
 
 .mensagem{
-    margin-top:15px;
-    font-size:18px;
+margin-top:15px;
+font-size:18px;
 }
 </style>
 </head>
@@ -83,7 +83,7 @@ button{
 <label><input type="radio" name="modo" value="soma"> Soma (até 4 algarismos)</label><br>
 <label><input type="radio" name="modo" value="subtracao"> Subtração (até 4 algarismos)</label><br>
 <label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação (até 2 algarismos)</label><br>
-<label><input type="radio" name="modo" value="divisao"> Divisão (quociente inteiro)</label><br><br>
+<label><input type="radio" name="modo" value="divisao"> Divisão (2 dígitos ÷ 1 dígito)</label><br><br>
 
 <button onclick="iniciar()">Iniciar</button>
 </div>
@@ -268,22 +268,13 @@ case "divisao":
 
 operacao="÷"
 
-b=gerarNumero(998)+1
+// divisor 1 dígito
+b=gerarNumero(8)+1
 
-let minResultado=Math.ceil(10/b)
-let maxResultado=Math.floor(999/b)
-
-if(maxResultado<minResultado){
-
-b=1
-minResultado=10
-maxResultado=999
-
-}
-
-let resultado=gerarNumero(maxResultado-minResultado)+minResultado
-
-a=b*resultado
+// procura um número de 2 dígitos divisível por b
+do{
+a=gerarNumero(89)+10
+}while(a%b!==0)
 
 break
 
