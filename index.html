@@ -83,7 +83,7 @@ font-size:18px;
 <label><input type="radio" name="modo" value="soma"> Soma (até 4 algarismos)</label><br>
 <label><input type="radio" name="modo" value="subtracao"> Subtração (até 4 algarismos)</label><br>
 <label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação (até 2 algarismos)</label><br>
-<label><input type="radio" name="modo" value="divisao"> Divisão (2 dígitos ÷ 1 dígito)</label><br><br>
+<label><input type="radio" name="modo" value="divisao"> Divisão (3 dígitos ÷ 2 dígitos)</label><br><br>
 
 <button onclick="iniciar()">Iniciar</button>
 </div>
@@ -268,13 +268,22 @@ case "divisao":
 
 operacao="÷"
 
-// divisor 1 dígito
-b=gerarNumero(8)+1
+// divisor de 2 dígitos
+b=gerarNumero(89)+10
 
-// procura um número de 2 dígitos divisível por b
-do{
-a=gerarNumero(89)+10
-}while(a%b!==0)
+let minResultado=Math.ceil(100/b)
+let maxResultado=Math.floor(999/b)
+
+// segurança
+if(maxResultado<minResultado){
+b=10
+minResultado=10
+maxResultado=99
+}
+
+let resultado=gerarNumero(maxResultado-minResultado)+minResultado
+
+a=b*resultado
 
 break
 
