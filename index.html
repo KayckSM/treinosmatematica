@@ -15,7 +15,6 @@ margin-top:40px;
 position:fixed;
 top:10px;
 right:20px;
-text-align:right;
 background:#f0f0f0;
 padding:12px;
 border-radius:8px;
@@ -30,11 +29,15 @@ font-weight:bold;
 .atalho{
 font-size:12px;
 color:#555;
-margin-top:5px;
+}
+
+.abas button{
+margin:5px;
+padding:6px 12px;
 }
 
 .modos{
-margin-bottom:20px;
+margin-top:15px;
 }
 
 .conta{
@@ -45,14 +48,8 @@ margin:20px 0;
 input{
 font-size:18px;
 padding:5px;
-width:120px;
+width:140px;
 text-align:center;
-}
-
-button{
-font-size:13px;
-padding:5px 10px;
-margin:3px;
 }
 
 .mensagem{
@@ -66,301 +63,197 @@ font-size:18px;
 
 <div class="cronometro-container">
 <div class="tempo" id="tempo">00:00:000</div>
-
 <button onclick="iniciarCronometro()">Iniciar</button>
 <button onclick="pausarCronometro()">Pausar</button>
 <button onclick="continuarCronometro()">Voltar</button>
 <button onclick="resetarCronometro()">Resetar</button>
-
-<div class="atalho">Pressione a tecla "T" para pausar ou voltar</div>
+<div class="atalho">Tecla "T" pausa/continua</div>
 </div>
 
 <h1>Treino de Matemática</h1>
 
-<div class="modos">
+<div class="abas">
+<button onclick="trocarAba('basico')">Operações Básicas</button>
+<button onclick="trocarAba('decimal')">Decimais</button>
+</div>
+
+<div id="basico" class="modos">
 <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
 <label><input type="radio" name="modo" value="tabuadaRand"> Tabuada Aleatória</label><br>
-<label><input type="radio" name="modo" value="soma"> Soma (até 4 algarismos)</label><br>
-<label><input type="radio" name="modo" value="subtracao"> Subtração (até 4 algarismos)</label><br>
-<label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação (até 2 algarismos)</label><br>
-<label><input type="radio" name="modo" value="divisao"> Divisão (3 dígitos ÷ 2 dígitos)</label><br><br>
-
-<button onclick="iniciar()">Iniciar</button>
+<label><input type="radio" name="modo" value="soma"> Soma</label><br>
+<label><input type="radio" name="modo" value="subtracao"> Subtração</label><br>
+<label><input type="radio" name="modo" value="multiplicacao2d"> Multiplicação</label><br>
+<label><input type="radio" name="modo" value="divisao"> Divisão</label><br>
 </div>
+
+<div id="decimal" class="modos" style="display:none">
+<label><input type="radio" name="modo" value="somaDec"> Soma decimal</label><br>
+<label><input type="radio" name="modo" value="subDec"> Subtração decimal</label><br>
+<label><input type="radio" name="modo" value="multDec"> Multiplicação decimal</label><br>
+<label><input type="radio" name="modo" value="divIntDec"> Inteiro ÷ decimal</label><br>
+<label><input type="radio" name="modo" value="divDec"> Inteiro ÷ inteiro (decimal)</label><br>
+</div>
+
+<br>
+<button onclick="iniciar()">Iniciar</button>
 
 <div class="conta" id="conta"></div>
 
-<input type="number" id="resposta" placeholder="Resposta">
-<button onclick="verificar()">OK</button>
-
+<input type="text" id="resposta" placeholder="Resposta">
 <div class="mensagem" id="mensagem"></div>
 
 <script>
 
 /* CRONÔMETRO */
 
-let inicioTempo=0
-let tempoDecorrido=0
-let intervalo=null
-let rodando=false
+let inicio=0, tempo=0, rodando=false, intervalo=null
 
-const tempoEl=document.getElementById("tempo")
+function atualizar(){
+let m=Math.floor(tempo/60000)
+let s=Math.floor((tempo%60000)/1000)
+let ms=tempo%1000
 
-function atualizarDisplay(){
-
-let total=tempoDecorrido
-
-let minutos=Math.floor(total/60000)
-let segundos=Math.floor((total%60000)/1000)
-let milissegundos=total%1000
-
-tempoEl.textContent=
-`${String(minutos).padStart(2,'0')}:`+
-`${String(segundos).padStart(2,'0')}:`+
-`${String(milissegundos).padStart(3,'0')}`
-
+document.getElementById("tempo").textContent=
+`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}:${String(ms).padStart(3,'0')}`
 }
 
 function iniciarCronometro(){
-
 if(!rodando){
-
-inicioTempo=Date.now()-tempoDecorrido
-
+inicio=Date.now()-tempo
 intervalo=setInterval(()=>{
-
-tempoDecorrido=Date.now()-inicioTempo
-atualizarDisplay()
-
+tempo=Date.now()-inicio
+atualizar()
 },10)
-
 rodando=true
 }
-
 }
 
 function pausarCronometro(){
-
-if(rodando){
-
 clearInterval(intervalo)
 rodando=false
-
-}
-
 }
 
 function continuarCronometro(){
-
-if(!rodando){
-
-iniciarCronometro()
-
-}
-
+if(!rodando) iniciarCronometro()
 }
 
 function resetarCronometro(){
-
 clearInterval(intervalo)
+tempo=0
 rodando=false
-tempoDecorrido=0
-atualizarDisplay()
-
+atualizar()
 }
 
-document.addEventListener("keydown",function(event){
-
-if(event.key.toLowerCase()==="t"){
-
-if(rodando){
-
-pausarCronometro()
-
-}else{
-
-continuarCronometro()
-
+document.addEventListener("keydown",e=>{
+if(e.key.toLowerCase()==="t"){
+rodando?pausarCronometro():continuarCronometro()
 }
-
-}
-
 })
 
-/* SISTEMA DE TREINO */
+/* SISTEMA */
 
-let modo="tabuadaSeq"
-let a=1
-let b=1
-let operacao="×"
+let modo=""
+let a,b,correto
+const conta=document.getElementById("conta")
+const msg=document.getElementById("mensagem")
+const input=document.getElementById("resposta")
 
-const contaEl=document.getElementById("conta")
-const respostaEl=document.getElementById("resposta")
-const mensagemEl=document.getElementById("mensagem")
+function trocarAba(aba){
+document.getElementById("basico").style.display=aba==="basico"?"block":"none"
+document.getElementById("decimal").style.display=aba==="decimal"?"block":"none"
+}
+
+function rand(max){return Math.floor(Math.random()*max)}
+
+function randDec(maxInt, maxDec){
+let inteiro=rand(maxInt)
+let decimal=rand(maxDec+1)
+return Number((inteiro + decimal/100).toFixed(2))
+}
 
 function iniciar(){
-
 modo=document.querySelector('input[name="modo"]:checked').value
-
-a=1
-b=1
-
-respostaEl.style.display="inline-block"
-
-mostrarConta()
-
+gerar()
 }
 
-function gerarNumero(max){
+function gerar(){
 
-return Math.floor(Math.random()*(max+1))
-
-}
-
-function mostrarConta(){
-
-mensagemEl.textContent=""
-respostaEl.value=""
-respostaEl.focus()
+msg.textContent=""
+input.value=""
+input.focus()
 
 switch(modo){
 
-case "tabuadaSeq":
-
-operacao="×"
+case "somaDec":
+a=randDec(100,99)
+b=randDec(100,99)
+correto=Number((a+b).toFixed(2))
 break
 
-case "tabuadaRand":
-
-operacao="×"
-a=gerarNumero(8)+1
-b=gerarNumero(8)+1
-break
-
-case "soma":
-
-operacao="+"
-a=gerarNumero(9999)
-b=gerarNumero(9999)
-break
-
-case "subtracao":
-
-operacao="−"
-
-a=gerarNumero(9999)
-b=gerarNumero(9999)
-
+case "subDec":
+a=randDec(100,99)
+b=randDec(100,99)
 if(b>a)[a,b]=[b,a]
-
+correto=Number((a-b).toFixed(2))
 break
 
-case "multiplicacao2d":
-
-operacao="×"
-
-a=gerarNumero(99)
-b=gerarNumero(99)
-
+case "multDec":
+a=(rand(9)+1)+(rand(10)/10)
+b=(rand(9)+1)+(rand(10)/10)
+correto=Number((a*b).toFixed(2))
 break
 
-case "divisao":
+case "divIntDec":
+b=(rand(9)+1)+(rand(10)/10)
+let resultado=rand(9)+1
+a=Number((b*resultado).toFixed(1))
+correto=resultado
+break
 
-operacao="÷"
+case "divDec":
+b=rand(90)+1
+let r=(rand(90)+1)/10
+a=b*r
+correto=Number(r.toFixed(1))
+break
 
-// divisor de 2 dígitos
-b=gerarNumero(89)+10
-
-let minResultado=Math.ceil(100/b)
-let maxResultado=Math.floor(999/b)
-
-// segurança
-if(maxResultado<minResultado){
-b=10
-minResultado=10
-maxResultado=99
-}
-
-let resultado=gerarNumero(maxResultado-minResultado)+minResultado
-
-a=b*resultado
-
+default:
+a=rand(9)+1
+b=rand(9)+1
+correto=a*b
 break
 
 }
 
-contaEl.textContent=`${a} ${operacao} ${b} = ?`
+conta.textContent=`${a} ? ${b} = ?`
 
+let opMap={
+somaDec:"+",
+subDec:"−",
+multDec:"×",
+divIntDec:"÷",
+divDec:"÷"
 }
+
+conta.textContent=`${a} ${opMap[modo]||"×"} ${b} = ?`
+}
+
+input.addEventListener("keydown",e=>{
+if(e.key==="Enter") verificar()
+})
 
 function verificar(){
 
-const resposta=Number(respostaEl.value)
-
-let correto
-
-switch(operacao){
-
-case "×": correto=a*b; break
-case "+": correto=a+b; break
-case "−": correto=a-b; break
-case "÷": correto=a/b; break
-
-}
+let resposta=parseFloat(input.value)
 
 if(resposta===correto){
-
-if(modo==="tabuadaSeq"){
-
-proximaSequencia()
-
+msg.textContent="✅ Correto!"
+setTimeout(gerar,600)
 }else{
-
-mensagemEl.textContent="✅ Correto!"
-setTimeout(mostrarConta,600)
-
-}
-
-}else{
-
-mensagemEl.textContent="❌ Errado, tente novamente."
-
+msg.textContent="❌ Errado"
 }
 
 }
-
-function proximaSequencia(){
-
-b++
-
-if(b>9){
-
-b=1
-a++
-
-}
-
-if(a>9){
-
-contaEl.textContent="🎉 Você concluiu a tabuada!"
-respostaEl.style.display="none"
-return
-
-}
-
-mostrarConta()
-
-}
-
-respostaEl.addEventListener("keydown",function(event){
-
-if(event.key==="Enter"){
-
-verificar()
-
-}
-
-})
 
 </script>
 
