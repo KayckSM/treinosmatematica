@@ -72,7 +72,6 @@ font-size:18px;
 <button onclick="trocarAba('decimal')">Decimais</button>
 </div>
 
-<!-- ABA BÁSICA -->
 <div id="basico" class="modos">
 <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
 <label><input type="radio" name="modo" value="tabuadaRand"> Tabuada Aleatória</label><br>
@@ -82,13 +81,12 @@ font-size:18px;
 <label><input type="radio" name="modo" value="divisao"> Divisão</label><br>
 </div>
 
-<!-- ABA DECIMAL -->
 <div id="decimal" class="modos" style="display:none">
 <label><input type="radio" name="modo" value="somaDec"> Soma decimal</label><br>
 <label><input type="radio" name="modo" value="subDec"> Subtração decimal</label><br>
 <label><input type="radio" name="modo" value="multDec"> Multiplicação decimal</label><br>
-<label><input type="radio" name="modo" value="divIntDec"> Inteiro ÷ decimal</label><br>
-<label><input type="radio" name="modo" value="divDec"> Inteiro ÷ inteiro (decimal)</label><br>
+<label><input type="radio" name="modo" value="divIntDec"> Decimal ÷ Decimal</label><br>
+<label><input type="radio" name="modo" value="divDec"> Inteiro ÷ Inteiro (decimal)</label><br>
 </div>
 
 <br>
@@ -150,7 +148,7 @@ rodando?pausarCronometro():continuarCronometro()
 
 let modo=""
 let a=1,b=1
-let correto
+let correto=null
 let operacao="×"
 
 const conta=document.getElementById("conta")
@@ -176,6 +174,7 @@ function gerar(){
 msg.textContent=""
 input.value=""
 input.focus()
+correto=null
 
 switch(modo){
 
@@ -245,44 +244,35 @@ b=(rand(9)+1+(rand(10)/10)).toFixed(1)
 correto=(a*b).toFixed(2)
 break
 
+/* NOVA DIVISÃO 1 */
 case "divIntDec":
 operacao="÷"
 
-// divisor decimal (X.X)
 b = (rand(9)+1 + rand(10)/10)
-
-// resultado inteiro
 let resultado1 = rand(9)+1
+a = (b * resultado1)
 
-// dividendo (XX.X)
-a = (b * resultado1).toFixed(1)
-
-// garantir 2 casas inteiras
 while(a < 10 || a > 99.9){
-    resultado1 = rand(9)+1
-    a = (b * resultado1).toFixed(1)
+resultado1 = rand(9)+1
+a = (b * resultado1)
 }
 
-correto = resultado1
+a = a.toFixed(1)
 b = b.toFixed(1)
+correto = resultado1
 break
 
+/* NOVA DIVISÃO 2 */
 case "divDec":
 operacao="÷"
 
-// divisor inteiro (1 a 99)
 b = rand(98)+1
-
-// resultado decimal com 1 casa
-let resultado2 = (rand(90)+10) / 10  // 1.0 até 9.9
-
-// dividendo
+let resultado2 = (rand(90)+10) / 10
 a = b * resultado2
 
-// garantir inteiro até 3 dígitos
 while(a > 999 || !Number.isInteger(a)){
-    resultado2 = (rand(90)+10) / 10
-    a = b * resultado2
+resultado2 = (rand(90)+10) / 10
+a = b * resultado2
 }
 
 correto = resultado2.toFixed(1)
@@ -290,8 +280,8 @@ break
 
 }
 
-/* cálculo básico */
-if(!correto){
+/* cálculo automático básico */
+if(correto===null){
 switch(operacao){
 case "+": correto=a+b; break
 case "−": correto=a-b; break
@@ -316,7 +306,6 @@ let valor=parseFloat(resposta)
 
 if(valor==correto){
 msg.textContent="✅ Correto!"
-correto=null
 setTimeout(gerar,600)
 }else{
 msg.textContent="❌ Errado"
