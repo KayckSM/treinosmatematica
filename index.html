@@ -26,11 +26,6 @@ font-size:22px;
 font-weight:bold;
 }
 
-.atalho{
-font-size:12px;
-color:#555;
-}
-
 .abas button{
 margin:5px;
 padding:6px 12px;
@@ -67,7 +62,7 @@ font-size:18px;
 <button onclick="pausarCronometro()">Pausar</button>
 <button onclick="continuarCronometro()">Voltar</button>
 <button onclick="resetarCronometro()">Resetar</button>
-<div class="atalho">Tecla "T" pausa/continua</div>
+<div>Tecla "T" pausa/continua</div>
 </div>
 
 <h1>Treino de Matemática</h1>
@@ -77,6 +72,7 @@ font-size:18px;
 <button onclick="trocarAba('decimal')">Decimais</button>
 </div>
 
+<!-- ABA BÁSICA -->
 <div id="basico" class="modos">
 <label><input type="radio" name="modo" value="tabuadaSeq" checked> Tabuada Sequencial</label><br>
 <label><input type="radio" name="modo" value="tabuadaRand"> Tabuada Aleatória</label><br>
@@ -86,6 +82,7 @@ font-size:18px;
 <label><input type="radio" name="modo" value="divisao"> Divisão</label><br>
 </div>
 
+<!-- ABA DECIMAL -->
 <div id="decimal" class="modos" style="display:none">
 <label><input type="radio" name="modo" value="somaDec"> Soma decimal</label><br>
 <label><input type="radio" name="modo" value="subDec"> Subtração decimal</label><br>
@@ -105,7 +102,6 @@ font-size:18px;
 <script>
 
 /* CRONÔMETRO */
-
 let inicio=0, tempo=0, rodando=false, intervalo=null
 
 function atualizar(){
@@ -153,7 +149,10 @@ rodando?pausarCronometro():continuarCronometro()
 /* SISTEMA */
 
 let modo=""
-let a,b,correto
+let a=1,b=1
+let correto
+let operacao="×"
+
 const conta=document.getElementById("conta")
 const msg=document.getElementById("mensagem")
 const input=document.getElementById("resposta")
@@ -165,14 +164,10 @@ document.getElementById("decimal").style.display=aba==="decimal"?"block":"none"
 
 function rand(max){return Math.floor(Math.random()*max)}
 
-function randDec(maxInt, maxDec){
-let inteiro=rand(maxInt)
-let decimal=rand(maxDec+1)
-return Number((inteiro + decimal/100).toFixed(2))
-}
-
 function iniciar(){
 modo=document.querySelector('input[name="modo"]:checked').value
+a=1
+b=1
 gerar()
 }
 
@@ -184,70 +179,118 @@ input.focus()
 
 switch(modo){
 
+/* BÁSICO */
+
+case "tabuadaSeq":
+operacao="×"
+break
+
+case "tabuadaRand":
+operacao="×"
+a=rand(9)+1
+b=rand(9)+1
+break
+
+case "soma":
+operacao="+"
+a=rand(10000)
+b=rand(10000)
+break
+
+case "subtracao":
+operacao="−"
+a=rand(10000)
+b=rand(10000)
+if(b>a)[a,b]=[b,a]
+break
+
+case "multiplicacao2d":
+operacao="×"
+a=rand(100)
+b=rand(100)
+break
+
+case "divisao":
+operacao="÷"
+b=rand(90)+10
+let min=Math.ceil(100/b)
+let max=Math.floor(999/b)
+let r=rand(max-min+1)+min
+a=b*r
+break
+
+/* DECIMAIS */
+
 case "somaDec":
-a=randDec(100,99)
-b=randDec(100,99)
-correto=Number((a+b).toFixed(2))
+operacao="+"
+a=(rand(100)+(rand(100)/100)).toFixed(2)
+b=(rand(100)+(rand(100)/100)).toFixed(2)
+correto=(parseFloat(a)+parseFloat(b)).toFixed(2)
 break
 
 case "subDec":
-a=randDec(100,99)
-b=randDec(100,99)
+operacao="−"
+a=(rand(100)+(rand(100)/100))
+b=(rand(100)+(rand(100)/100))
 if(b>a)[a,b]=[b,a]
-correto=Number((a-b).toFixed(2))
+correto=(a-b).toFixed(2)
+a=a.toFixed(2)
+b=b.toFixed(2)
 break
 
 case "multDec":
-a=(rand(9)+1)+(rand(10)/10)
-b=(rand(9)+1)+(rand(10)/10)
-correto=Number((a*b).toFixed(2))
+operacao="×"
+a=(rand(9)+1+(rand(10)/10)).toFixed(1)
+b=(rand(9)+1+(rand(10)/10)).toFixed(1)
+correto=(a*b).toFixed(2)
 break
 
 case "divIntDec":
-b=(rand(9)+1)+(rand(10)/10)
-let resultado=rand(9)+1
-a=Number((b*resultado).toFixed(1))
-correto=resultado
+operacao="÷"
+b=(rand(9)+1+(rand(10)/10))
+let res=rand(9)+1
+a=(b*res).toFixed(1)
+correto=res
+b=b.toFixed(1)
 break
 
 case "divDec":
+operacao="÷"
 b=rand(90)+1
-let r=(rand(90)+1)/10
-a=b*r
-correto=Number(r.toFixed(1))
-break
-
-default:
-a=rand(9)+1
-b=rand(9)+1
-correto=a*b
+let res2=(rand(90)+1)/10
+a=b*res2
+correto=res2.toFixed(1)
 break
 
 }
 
-conta.textContent=`${a} ? ${b} = ?`
-
-let opMap={
-somaDec:"+",
-subDec:"−",
-multDec:"×",
-divIntDec:"÷",
-divDec:"÷"
+/* cálculo básico */
+if(!correto){
+switch(operacao){
+case "+": correto=a+b; break
+case "−": correto=a-b; break
+case "×": correto=a*b; break
+case "÷": correto=a/b; break
+}
 }
 
-conta.textContent=`${a} ${opMap[modo]||"×"} ${b} = ?`
+conta.textContent=`${a} ${operacao} ${b} = ?`
+
 }
 
+/* resposta */
 input.addEventListener("keydown",e=>{
 if(e.key==="Enter") verificar()
 })
 
 function verificar(){
 
-let resposta=parseFloat(input.value)
+let resposta=input.value.replace(",",".")
+let valor=parseFloat(resposta)
 
-if(resposta===correto){
+if(valor==correto){
 msg.textContent="✅ Correto!"
+correto=null
 setTimeout(gerar,600)
 }else{
 msg.textContent="❌ Errado"
