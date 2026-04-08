@@ -247,19 +247,45 @@ break
 
 case "divIntDec":
 operacao="÷"
-b=(rand(9)+1+(rand(10)/10))
-let res=rand(9)+1
-a=(b*res).toFixed(1)
-correto=res
-b=b.toFixed(1)
+
+// divisor decimal (X.X)
+b = (rand(9)+1 + rand(10)/10)
+
+// resultado inteiro
+let resultado1 = rand(9)+1
+
+// dividendo (XX.X)
+a = (b * resultado1).toFixed(1)
+
+// garantir 2 casas inteiras
+while(a < 10 || a > 99.9){
+    resultado1 = rand(9)+1
+    a = (b * resultado1).toFixed(1)
+}
+
+correto = resultado1
+b = b.toFixed(1)
 break
 
 case "divDec":
 operacao="÷"
-b=rand(90)+1
-let res2=(rand(90)+1)/10
-a=b*res2
-correto=res2.toFixed(1)
+
+// divisor inteiro (1 a 99)
+b = rand(98)+1
+
+// resultado decimal com 1 casa
+let resultado2 = (rand(90)+10) / 10  // 1.0 até 9.9
+
+// dividendo
+a = b * resultado2
+
+// garantir inteiro até 3 dígitos
+while(a > 999 || !Number.isInteger(a)){
+    resultado2 = (rand(90)+10) / 10
+    a = b * resultado2
+}
+
+correto = resultado2.toFixed(1)
 break
 
 }
